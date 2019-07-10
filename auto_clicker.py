@@ -16,6 +16,7 @@ class Autoclicker(object):
     clicking_time = 5
     x = None
     y = None
+    custom_position = False  # to properly show xy pos. in status
 
     @staticmethod
     def start_clicking():
