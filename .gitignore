@@ -2,6 +2,7 @@
 build
 *.env
 *.key
+*.idea
 
 # python
 __pycache__
