@@ -5,6 +5,7 @@ import pyautogui
 
 window = tk.Tk()
 window.title("auto-clicker")
+# TODO change this back to original. Changed due to dpi settings
 window.geometry("650x350")
 window.minsize(650, 350)
 window.maxsize(650, 350)

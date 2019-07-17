@@ -25,13 +25,13 @@ class Autoclicker(object):
         # make the clicker thread a daemon so it lives and dies
         # with the main application
         Autoclicker.clicker_thread.daemon = True
-        Autoclicker.stop_event.set()
+        Autoclicker.stop_event.clear()
         Autoclicker.clicker_thread.start()
         Autoclicker.state = STATE.STARTED
 
     @staticmethod
     def stop_clicking():
-        Autoclicker.stop_event.clear()
+        Autoclicker.stop_event.set()
         Autoclicker.state = STATE.STOPPED
 
     @staticmethod
@@ -40,7 +40,7 @@ class Autoclicker(object):
 
     @staticmethod
     def __clicking_thread():
-        while Autoclicker.stop_event.is_set():
+        while not Autoclicker.stop_event.is_set():
             time.sleep(Autoclicker.clicking_time)
             if Autoclicker.x is None or Autoclicker.y is None:
                 pyautogui.click()
