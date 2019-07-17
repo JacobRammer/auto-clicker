@@ -5,9 +5,9 @@ import pyautogui
 
 window = tk.Tk()
 window.title("auto-clicker")
-window.geometry("400x250")
-window.minsize(300, 250)
-window.maxsize(400, 250)
+window.geometry("650x350")
+window.minsize(650, 350)
+window.maxsize(650, 350)
 validation_regex = r"(?P<time>[\d]+)"  # only capture numbers
 
 
@@ -16,11 +16,11 @@ def handle_start_stop_press():
         ac.Autoclicker.start_clicking()
         start_stop_text.set("STOP")
         start_stop_button.configure(bg="red")
+        update_status()
     else:
         ac.Autoclicker.stop_clicking()
         start_stop_text.set("START")
         start_stop_button.configure(bg="green")
-        # status_label_msg.set("Stopped auto-clicker")
 
 
 def set_click_time():
@@ -34,13 +34,12 @@ def set_click_time():
     if interval_time != -1 and interval_time > 0:
         ac.Autoclicker.clicking_time = interval_time
         set_time.delete(0, tk.END)
-        # status_label_msg.set(f"Click interval set to {ac.Autoclicker.clicking_time}s")
         # remove blinking cursor by focusing on set time button
         set_time_button.focus()
         update_status()
     else:
         set_time.delete(0, tk.END)
-        # status_label_msg.set("No change made to interval")
+        status_label_msg.set("No change made to interval")
 
 
 def set_click_location():
@@ -60,6 +59,8 @@ def set_click_location():
         set_x.delete(0, tk.END)
         set_y.delete(0, tk.END)
         update_status()
+    else:
+        status_label_msg.set("No change made to location")
 
 
 def get_validated_interval(value) -> int:
@@ -91,19 +92,45 @@ def reset_var() -> str:
 
 
 def update_status():
-    # TODO update cursor position in real time
-    #   add message to handle invalid positions
+    """
+    Catch all function to update the
+    information to status label
+    """
+    # TODO 1: update cursor position in real time
+    #   1 partially done, now real time but need to hold down key
+    #   2: add message to handle invalid positions
 
     status_label_msg.set(f"[Interval: {ac.Autoclicker.clicking_time} sec.]"
                          f"[Click position: {check_custom_pos()}]")
 
 
 def check_custom_pos() -> str:
+    """
+    Depending on the state of
+    Autoclicker.custom_position, return
+    the correct string to show on the status label
+    """
     if ac.Autoclicker.custom_position is True:
         return f"{ac.Autoclicker.x}, {ac.Autoclicker.y}"
 
     else:
-        return "cursor"
+        return f"cursor"
+
+
+def assisted_location(event: tk.Event):
+    """
+    Allow for easy finding of cursor location.
+    While holding down (or single press of) c,
+    the coordinates are displayed and entered into
+    the custom fields. Could use lambda function
+    to get rid of event param. Window must be
+    focused.
+    """
+
+    set_x.delete(0, tk.END)
+    set_y.delete(0, tk.END)
+    set_x.insert(0, pyautogui.position().x)
+    set_y.insert(0, pyautogui.position().y)
 
 
 # create start / stop button
@@ -119,7 +146,7 @@ start_stop_button = tk.Button(
 start_stop_button.pack(fill=tk.X, padx=5, pady=5, ipadx=20, ipady=20)
 
 """
-Create start / stop button
+Create interval 
 """
 frame2 = tk.Frame()
 frame2.pack(side="top", fill="x")
@@ -133,7 +160,7 @@ set_time_button.pack(side=tk.RIGHT,
                      fill=tk.X, padx=5, pady=5, ipadx=70, ipady=5)
 set_time.bind("<Button-1>", lambda x: set_time.delete(0, tk.END))  # on left click, delete textbox contents
 """
-End start / stop button 
+End create interval
 """
 
 # create custom x + y location text
@@ -151,6 +178,7 @@ set_xy_button = tk.Button(frame3,
                           text="Set click location",
                           command=set_click_location, bg="green")
 set_xy_button.pack(side=tk.RIGHT, fill=tk.X, padx=5, pady=5, ipadx=70, ipady=5)
+window.bind("c", assisted_location)
 
 """
 Status label
